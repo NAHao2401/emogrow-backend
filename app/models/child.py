@@ -19,3 +19,5 @@ class Child(Base):
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
     parent = relationship("User")
+    emotion_logs = relationship("EmotionLog", back_populates="child")
+    sticker_collections = relationship("StickerCollection", back_populates="child")
