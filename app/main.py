@@ -15,7 +15,7 @@ from app.core.error_handler import (
 )
 from app.db.base import Base
 from app.db.session import engine
-from app.models import user, child
+from app.models import user, child, emotion
 
 Base.metadata.create_all(bind=engine)
 
