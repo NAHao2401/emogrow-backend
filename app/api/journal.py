@@ -1,6 +1,7 @@
-from typing import List
+from typing import List, Optional
+from datetime import date
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session
 
 from app.api.deps import get_db, get_current_user
@@ -26,7 +27,8 @@ def post_diary(
 @router.get("/children/{child_id}/diaries", response_model=List[DiaryListItem])
 def list_diaries(
     child_id: int,
+    date: Optional[date] = None,
     db: Session = Depends(get_db),
     current_user = Depends(get_current_user)
 ):
-    return get_diaries(child_id, db, current_user)
+    return get_diaries(child_id, db, current_user, date_filter=date)

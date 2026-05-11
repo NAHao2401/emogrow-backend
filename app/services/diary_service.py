@@ -87,6 +87,7 @@ def create_diary(child_id: int, data, db: Session, current_user):
             "emotion_color": None,
             "plant_state": new_diary.plant_state,
             "feeling_note": new_diary.feeling_note,
+            "diary_date": new_diary.diary_date,
             "created_at": new_diary.created_at,
         }
 
@@ -95,13 +96,16 @@ def create_diary(child_id: int, data, db: Session, current_user):
         raise
 
 
-def get_diaries(child_id: int, db: Session, current_user):
+def get_diaries(child_id: int, db: Session, current_user, date_filter: date = None):
     # Verify ownership
     get_child_by_id(child_id, db, current_user)
 
-    diaries = db.query(EmotionDiary).filter(
-        EmotionDiary.child_id == child_id
-    ).order_by(EmotionDiary.created_at.desc()).all()
+    query = db.query(EmotionDiary).filter(EmotionDiary.child_id == child_id)
+    
+    if date_filter:
+        query = query.filter(EmotionDiary.diary_date == date_filter)
+
+    diaries = query.order_by(EmotionDiary.created_at.desc()).all()
 
     results = []
     for diary in diaries:
@@ -114,6 +118,7 @@ def get_diaries(child_id: int, db: Session, current_user):
             "emotion_color": None,
             "plant_state": diary.plant_state,
             "feeling_note": diary.feeling_note,
+            "diary_date": diary.diary_date,
             "created_at": diary.created_at,
         })
 

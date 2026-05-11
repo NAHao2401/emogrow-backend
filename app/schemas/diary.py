@@ -47,6 +47,7 @@ class DiaryListItem(BaseModel):
     emotion_color: Optional[str] = None
     plant_state: str
     feeling_note: Optional[str] = None
+    diary_date: date
     created_at: datetime
 
     class Config:
