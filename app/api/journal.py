@@ -6,12 +6,18 @@ from sqlalchemy.orm import Session
 
 from app.api.deps import get_db, get_current_user
 from app.schemas.diary import CreateDiaryRequest, DiaryListItem
+from app.schemas.emotion import EmotionResponse
 from app.services.diary_service import create_diary, get_diaries
+from app.services.emotion_service import get_all_emotions
 
 router = APIRouter(prefix="/api", tags=["Journal"])
 
 
-
+@router.get("/emotions", response_model=List[EmotionResponse])
+def list_emotions(
+    db: Session = Depends(get_db)
+):
+    return get_all_emotions(db)
 
 
 @router.post("/children/{child_id}/diaries", response_model=DiaryListItem)

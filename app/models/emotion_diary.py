@@ -25,3 +25,4 @@ class EmotionDiary(Base):
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
     child = relationship("Child")
+    emotion = relationship("Emotion")

@@ -21,9 +21,6 @@ import logging
 from app.models import user, child
 import app.models.emotion
 import app.models.emotion_diary
-import app.models.emotion_jar
-import app.models.emotion_jar_item
-import app.models.knowledge_bookshelf_item
 
 
 Base.metadata.create_all(bind=engine)
@@ -37,11 +34,21 @@ def _seed_default_emotions():
         count = db.query(Emotion).count()
         if count == 0:
             defaults = [
-                {"name": "Vui", "emoji": "😊", "color_code": "#FFD700", "description": "Cảm xúc vui vẻ"},
-                {"name": "Buồn", "emoji": "😢", "color_code": "#1E90FF", "description": "Cảm xúc buồn"},
-                {"name": "Sợ", "emoji": "😨", "color_code": "#800080", "description": "Cảm xúc sợ hãi"},
-                {"name": "Tức", "emoji": "😡", "color_code": "#FF4500", "description": "Cảm xúc tức giận"},
-                {"name": "Lo", "emoji": "😟", "color_code": "#FFA500", "description": "Cảm xúc lo lắng"},
+                {"name": "Vui vẻ", "emoji": "😊", "color_code": "#FFD54F", "description": "Cảm xúc khi trẻ cảm thấy hạnh phúc, thoải mái và muốn cười."},
+                {"name": "Buồn", "emoji": "😢", "color_code": "#64B5F6", "description": "Cảm xúc khi trẻ cảm thấy không vui, thất vọng hoặc mất mát."},
+                {"name": "Tức giận", "emoji": "😡", "color_code": "#EF5350", "description": "Cảm xúc khi trẻ cảm thấy khó chịu, bực bội hoặc không hài lòng."},
+                {"name": "Sợ hãi", "emoji": "😨", "color_code": "#9575CD", "description": "Cảm xúc khi trẻ cảm thấy lo lắng, bất an hoặc sợ một điều gì đó."},
+                {"name": "Ngạc nhiên", "emoji": "😮", "color_code": "#FFB74D", "description": "Cảm xúc khi trẻ gặp điều bất ngờ hoặc chưa từng nghĩ tới."},
+                {"name": "Lo lắng", "emoji": "😟", "color_code": "#4DB6AC", "description": "Cảm xúc khi trẻ cảm thấy bồn chồn, hồi hộp hoặc không yên tâm."},
+                {"name": "Xấu hổ", "emoji": "😳", "color_code": "#F48FB1", "description": "Cảm xúc khi trẻ cảm thấy ngại ngùng, lúng túng hoặc mắc cỡ."},
+                {"name": "Tự hào", "emoji": "😊", "color_code": "#81C784", "description": "Cảm xúc khi trẻ cảm thấy vui vì đã làm được điều tốt hoặc đạt thành quả."},
+                {"name": "Yêu thương", "emoji": "🥰", "color_code": "#F06292", "description": "Cảm xúc khi trẻ cảm thấy được quan tâm, gần gũi hoặc muốn thể hiện tình cảm."},
+                {"name": "Bình tĩnh", "emoji": "😌", "color_code": "#90CAF9", "description": "Cảm xúc khi trẻ cảm thấy thoải mái, nhẹ nhàng và không căng thẳng."},
+                {"name": "Mệt mỏi", "emoji": "😴", "color_code": "#B0BEC5", "description": "Cảm xúc khi trẻ cảm thấy thiếu năng lượng, buồn ngủ hoặc cần nghỉ ngơi."},
+                {"name": "Cô đơn", "emoji": "🥺", "color_code": "#A1887F", "description": "Cảm xúc khi trẻ cảm thấy một mình, thiếu sự chia sẻ hoặc cần được quan tâm."},
+                {"name": "Bối rối", "emoji": "😕", "color_code": "#CE93D8", "description": "Cảm xúc khi trẻ chưa hiểu rõ điều gì đó hoặc không biết nên làm gì."},
+                {"name": "Ghen tị", "emoji": "😒", "color_code": "#AED581", "description": "Cảm xúc khi trẻ cảm thấy không vui vì người khác có điều mình mong muốn."},
+                {"name": "Hào hứng", "emoji": "🤩", "color_code": "#FF8A65", "description": "Cảm xúc khi trẻ cảm thấy rất vui, mong chờ hoặc thích thú với điều gì đó."},
             ]
 
             for e in defaults:
