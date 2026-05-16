@@ -5,6 +5,7 @@ from sqlalchemy.exc import SQLAlchemyError
 from app.api.auth import router as auth_router
 from app.api.children import router as children_router
 from app.api.review import router as review_router
+from app.api.emotions import router as emotions_router
 from app.core.exceptions import AppException
 from app.core.error_handler import (
     app_exception_handler,
@@ -14,7 +15,7 @@ from app.core.error_handler import (
 )
 from app.db.base import Base
 from app.db.session import engine
-from app.models import user, child, review
+from app.models import user, child, review, emotion
 
 Base.metadata.create_all(bind=engine)
 
@@ -28,6 +29,7 @@ app.add_exception_handler(Exception, general_exception_handler)
 app.include_router(auth_router)
 app.include_router(children_router)
 app.include_router(review_router)
+app.include_router(emotions_router)
 
 
 @app.get("/")

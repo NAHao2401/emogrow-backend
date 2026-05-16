@@ -21,3 +21,4 @@ class Child(Base):
     parent = relationship("User")
     emotion_logs = relationship("EmotionLog", back_populates="child")
     sticker_collections = relationship("StickerCollection", back_populates="child")
+    flashcard_progresses = relationship("ChildFlashcardProgress", back_populates="child")

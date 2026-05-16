@@ -10,6 +10,8 @@ from app.schemas.review import (
     StickerCollectionCreateRequest,
     EmotionStatisticsResponse,
     EmotionDistributionItem,
+    EmotionLogResponse,
+    StickerCollectionResponse
 )
 
 
@@ -108,3 +110,44 @@ def get_emotion_statistics(
         average_intensity=round(float(totals.average_intensity or 0), 2),
         distribution=distribution,
     )
+
+
+def get_emotion_logs(
+    child_id: int,
+    db: Session,
+    current_user: User,
+):
+    get_child_for_user(child_id, db, current_user)
+    logs = db.query(EmotionLog).filter(EmotionLog.child_id == child_id).all()
+    
+    return [
+        EmotionLogResponse(
+            emotion_log_id=log.emotion_log_id,
+            child_id=log.child_id,
+            emotion_type=log.emotion_type,
+            intensity=log.intensity,
+            audio_url=log.audio_url,
+            created_at=log.created_at.isoformat()
+        )
+        for log in logs
+    ]
+
+
+def get_stickers(
+    child_id: int,
+    db: Session,
+    current_user: User,
+):
+    get_child_for_user(child_id, db, current_user)
+    stickers = db.query(StickerCollection).filter(StickerCollection.child_id == child_id).all()
+    
+    return [
+        StickerCollectionResponse(
+            collection_id=s.collection_id,
+            child_id=s.child_id,
+            sticker_name=s.sticker_name,
+            note=s.note,
+            earned_at=s.earned_at.isoformat()
+        )
+        for s in stickers
+    ]

@@ -15,6 +15,29 @@ class StickerCollectionCreateRequest(BaseModel):
     note: Optional[str] = Field(default=None, max_length=500)
 
 
+class EmotionLogResponse(BaseModel):
+    emotion_log_id: int
+    child_id: int
+    emotion_type: str
+    intensity: int
+    audio_url: Optional[str]
+    created_at: str
+
+    class Config:
+        from_attributes = True
+
+
+class StickerCollectionResponse(BaseModel):
+    collection_id: int
+    child_id: int
+    sticker_name: str
+    note: Optional[str]
+    earned_at: str
+
+    class Config:
+        from_attributes = True
+
+
 class EmotionDistributionItem(BaseModel):
     emotion_type: str
     count: int
