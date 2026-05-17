@@ -8,3 +8,4 @@ pwdlib[argon2]
 python-jose[cryptography]
 pydantic[email]
 pydantic-settings
+python-multipart
