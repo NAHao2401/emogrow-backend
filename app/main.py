@@ -1,10 +1,13 @@
 from fastapi import FastAPI
+from fastapi.staticfiles import StaticFiles
 from fastapi.exceptions import RequestValidationError
 from sqlalchemy.exc import SQLAlchemyError
+import os
 
 from app.api.auth import router as auth_router
 from app.api.children import router as children_router
 from app.api.journal import router as journal_router
+from app.api.upload import router as upload_router
 from app.core.exceptions import AppException
 from app.core.error_handler import (
     app_exception_handler,
@@ -77,6 +80,7 @@ def _migrate_emotion_diaries_table():
         "ALTER TABLE emotion_diaries ADD COLUMN IF NOT EXISTS emotion_name VARCHAR(100);",
         "ALTER TABLE emotion_diaries ADD COLUMN IF NOT EXISTS emotion_emoji VARCHAR(10);",
         "ALTER TABLE emotion_diaries ADD COLUMN IF NOT EXISTS emotion_color VARCHAR(20);",
+        "ALTER TABLE emotion_diaries ADD COLUMN IF NOT EXISTS voice_url VARCHAR(255);",
         # Drop NOT NULL constraint on emotion_id if it exists
         ("DO $$ BEGIN\n"
          "IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='emotion_diaries' AND column_name='emotion_id') THEN\n"
@@ -111,6 +115,10 @@ app.add_exception_handler(Exception, general_exception_handler)
 app.include_router(auth_router)
 app.include_router(children_router)
 app.include_router(journal_router)
+app.include_router(upload_router)
+
+os.makedirs("uploads", exist_ok=True)
+app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
 
 
 @app.get("/")
