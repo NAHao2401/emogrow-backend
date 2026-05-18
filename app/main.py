@@ -4,6 +4,7 @@ from sqlalchemy.exc import SQLAlchemyError
 
 from app.api.auth import router as auth_router
 from app.api.children import router as children_router
+from app.api.game_progress import router as game_progress_router
 from app.api.emotions import router as emotions_router
 
 from app.core.exceptions import AppException
@@ -15,7 +16,8 @@ from app.core.error_handler import (
 )
 from app.db.base import Base
 from app.db.session import engine
-from app.models import user, child, emotion
+from app.models import user, child, emotion, game_progress
+
 
 Base.metadata.create_all(bind=engine)
 
@@ -28,6 +30,7 @@ app.add_exception_handler(Exception, general_exception_handler)
 
 app.include_router(auth_router)
 app.include_router(children_router)
+app.include_router(game_progress_router)
 app.include_router(emotions_router)
 
 
