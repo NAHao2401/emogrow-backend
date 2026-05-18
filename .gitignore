@@ -30,3 +30,4 @@ Thumbs.db
 # Alembic cache
 .pytest_cache/
 .mypy_cache/
+/GEMINI.md

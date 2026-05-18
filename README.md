@@ -35,6 +35,7 @@ Windows:
 ### 3. Cài đặt dependencies
 ```
 pip install -r requirements.txt
+pip install python-multipart
 ```
 ### 4. Cấu hình biến môi trường
 ```

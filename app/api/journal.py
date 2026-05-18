@@ -1,0 +1,40 @@
+from typing import List, Optional
+from datetime import date
+
+from fastapi import APIRouter, Depends, Query
+from sqlalchemy.orm import Session
+
+from app.api.deps import get_db, get_current_user
+from app.schemas.diary import CreateDiaryRequest, DiaryListItem
+from app.schemas.emotion import EmotionResponse
+from app.services.diary_service import create_diary, get_diaries
+from app.services.emotion_service import get_all_emotions
+
+router = APIRouter(prefix="/api", tags=["Journal"])
+
+
+@router.get("/emotions", response_model=List[EmotionResponse])
+def list_emotions(
+    db: Session = Depends(get_db)
+):
+    return get_all_emotions(db)
+
+
+@router.post("/children/{child_id}/diaries", response_model=DiaryListItem)
+def post_diary(
+    child_id: int,
+    data: CreateDiaryRequest,
+    db: Session = Depends(get_db),
+    current_user = Depends(get_current_user)
+):
+    return create_diary(child_id, data, db, current_user)
+
+
+@router.get("/children/{child_id}/diaries", response_model=List[DiaryListItem])
+def list_diaries(
+    child_id: int,
+    date: Optional[date] = None,
+    db: Session = Depends(get_db),
+    current_user = Depends(get_current_user)
+):
+    return get_diaries(child_id, db, current_user, date_filter=date)
