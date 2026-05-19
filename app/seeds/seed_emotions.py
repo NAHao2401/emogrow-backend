@@ -4,10 +4,18 @@ import os
 # Add current directory to path
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from app.db.session import SessionLocal
+from app.db.session import SessionLocal, engine
+from app.db.base import Base
+
+# Import all models to ensure metadata is registered for relationships
+from app.models import user, child, emotion, review, game_progress
+
 from app.models.emotion import Emotion, EmotionFlashcard
 
 def seed_data():
+    # Create tables if they don't exist
+    Base.metadata.create_all(bind=engine)
+
     db = SessionLocal()
     
     try:
