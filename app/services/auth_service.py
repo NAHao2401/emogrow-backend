@@ -1,7 +1,7 @@
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
 
-from app.core.exceptions import ConflictException, UnauthorizedException
+from app.core.exceptions import BadRequestException, ConflictException, UnauthorizedException
 from app.core.security import hash_password, verify_password, create_access_token
 from app.models.user import User
 from app.schemas.auth import RegisterRequest, LoginRequest, TokenResponse
@@ -56,3 +56,30 @@ def login_user(data: LoginRequest, db: Session):
         token_type="bearer",
         user=user
     )
+
+def change_password(data, db: Session, current_user: User):
+    if not verify_password(data.current_password, current_user.password_hash):
+        raise UnauthorizedException(
+            message="Mật khẩu hiện tại không đúng",
+            error_code="INVALID_CURRENT_PASSWORD"
+        )
+
+    if verify_password(data.new_password, current_user.password_hash):
+        raise BadRequestException(
+            message="Mật khẩu mới không được trùng với mật khẩu hiện tại",
+            error_code="NEW_PASSWORD_SAME_AS_OLD"
+        )
+
+    current_user.password_hash = hash_password(data.new_password)
+
+    try:
+        db.commit()
+
+        return {
+            "success": True,
+            "message": "Đổi mật khẩu thành công"
+        }
+
+    except SQLAlchemyError:
+        db.rollback()
+        raise
