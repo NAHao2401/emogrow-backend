@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 
 from app.core.exceptions import NotFoundException
 from app.models.child import Child
-from app.models.review import EmotionLog, StickerCollection
+from app.models.review import EmotionLog, StickerCollection, ChildReadBook
 from app.models.user import User
 from app.schemas.review import (
     EmotionLogCreateRequest,
@@ -11,7 +11,9 @@ from app.schemas.review import (
     EmotionStatisticsResponse,
     EmotionDistributionItem,
     EmotionLogResponse,
-    StickerCollectionResponse
+    StickerCollectionResponse,
+    ProgressResponse,
+    BookReadResponse
 )
 
 
@@ -45,6 +47,8 @@ def create_emotion_log(
         child_id=data.child_id,
         emotion_type=data.emotion_type.strip(),
         intensity=data.intensity,
+        source=data.source,
+        note=data.note,
         audio_url=data.audio_url,
     )
 
@@ -119,13 +123,15 @@ def get_emotion_logs(
 ):
     get_child_for_user(child_id, db, current_user)
     logs = db.query(EmotionLog).filter(EmotionLog.child_id == child_id).all()
-    
+
     return [
         EmotionLogResponse(
             emotion_log_id=log.emotion_log_id,
             child_id=log.child_id,
             emotion_type=log.emotion_type,
             intensity=log.intensity,
+            source=log.source,
+            note=log.note,
             audio_url=log.audio_url,
             created_at=log.created_at.isoformat()
         )
@@ -140,7 +146,7 @@ def get_stickers(
 ):
     get_child_for_user(child_id, db, current_user)
     stickers = db.query(StickerCollection).filter(StickerCollection.child_id == child_id).all()
-    
+
     return [
         StickerCollectionResponse(
             collection_id=s.collection_id,
@@ -151,3 +157,42 @@ def get_stickers(
         )
         for s in stickers
     ]
+
+
+def mark_book_as_read(
+    child_id: int,
+    book_id: str,
+    db: Session,
+    current_user: User,
+):
+    get_child_for_user(child_id, db, current_user)
+
+    existing = db.query(ChildReadBook).filter(
+        ChildReadBook.child_id == child_id,
+        ChildReadBook.book_id == book_id
+    ).first()
+
+    if existing:
+        return existing
+
+    record = ChildReadBook(child_id=child_id, book_id=book_id)
+    db.add(record)
+    db.commit()
+    db.refresh(record)
+    return record
+
+
+def get_progress(
+    child_id: int,
+    db: Session,
+    current_user: User,
+):
+    get_child_for_user(child_id, db, current_user)
+
+    books = db.query(ChildReadBook).filter(ChildReadBook.child_id == child_id).all()
+    stickers = db.query(StickerCollection).filter(StickerCollection.child_id == child_id).all()
+
+    return ProgressResponse(
+        read_book_ids=[b.book_id for b in books],
+        unlocked_sticker_ids=[s.sticker_name for s in stickers]
+    )

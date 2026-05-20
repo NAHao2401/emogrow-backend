@@ -1,6 +1,6 @@
 from typing import Optional
 from datetime import date, datetime
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
 class CreateDiaryRequest(BaseModel):
@@ -10,6 +10,7 @@ class CreateDiaryRequest(BaseModel):
     plant_state: str
     feeling_note: Optional[str] = None
     voice_url: Optional[str] = None
+    intensity: Optional[int] = Field(default=5, ge=1, le=10)
 
 
 class EmotionNested(BaseModel):
@@ -50,6 +51,7 @@ class DiaryListItem(BaseModel):
     plant_state: str
     feeling_note: Optional[str] = None
     voice_url: Optional[str] = None
+    intensity: Optional[int] = None
     created_at: datetime
 
     class Config:

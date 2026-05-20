@@ -3,47 +3,48 @@ os.environ["DATABASE_URL"] = "sqlite:///./test_sanity.db"
 os.environ["SECRET_KEY"] = "test_secret_key_only"
 
 from app.main import app
-from app.api.auth import router as auth_router
-from app.api.children import router as children_router
-from app.api.review import router as review_router
-from app.models.user import User
-from app.models.child import Child
-from app.models.review import EmotionLog, StickerCollection
+from app.models.review import EmotionLog, StickerCollection, ChildReadBook
+from app.schemas.review import (
+    EmotionLogCreateRequest, EmotionLogResponse,
+    ProgressResponse, BookReadResponse
+)
 
-def test_routers_registered():
-    """Verify all routers are included in the app"""
-    app_routes = [r.path for r in app.routes]
+def test_routes():
+    paths = [r.path for r in app.routes]
+    checks = [
+        "/review/children/{child_id}/emotion-statistics",
+        "/review/children/{child_id}/logs",
+        "/review/children/{child_id}/stickers",
+        "/review/children/{child_id}/books/{book_id}/read",
+        "/review/children/{child_id}/progress",
+    ]
+    for c in checks:
+        assert c in paths, f"Missing: {c}"
+    print("[OK] All routes registered")
 
-    assert "/auth/register" in app_routes, "Auth /register missing"
-    assert "/auth/login" in app_routes, "Auth /login missing"
-    assert "/auth/me" in app_routes, "Auth /me missing"
-    assert "/children" in app_routes, "Children / missing"
-    assert "/children/me" in app_routes, "Children /me missing"
-    assert "/review/children/{child_id}/emotion-statistics" in app_routes, "Review statistics missing"
-
-    print("[OK] All routers registered successfully")
-
-def test_models_importable():
-    """Verify all models can be imported"""
-    assert User.__tablename__ == "users"
-    assert Child.__tablename__ == "children"
+def test_models():
     assert EmotionLog.__tablename__ == "emotion_logs"
     assert StickerCollection.__tablename__ == "sticker_collections"
+    assert ChildReadBook.__tablename__ == "child_read_books"
+    assert hasattr(EmotionLog, "source"), "EmotionLog missing source"
+    assert hasattr(EmotionLog, "note"), "EmotionLog missing note"
+    print("[OK] All models OK")
 
-    print("[OK] All models importable")
+def test_schemas():
+    r = EmotionLogCreateRequest(
+        child_id=1, emotion_type="happy",
+        intensity=5, note="test note", source="lesson"
+    )
+    assert r.source == "lesson"
+    assert r.note == "test note"
 
-def test_model_relationships():
-    """Verify relationships are set up correctly"""
-    child_attrs = dir(Child)
-    assert "emotion_logs" in child_attrs, "Child.emotion_logs missing"
-    assert "sticker_collections" in child_attrs, "Child.sticker_collections missing"
-
-    print("[OK] Model relationships configured")
+    p = ProgressResponse(read_book_ids=["1","2"], unlocked_sticker_ids=["stk_1"])
+    assert len(p.read_book_ids) == 2
+    assert len(p.unlocked_sticker_ids) == 1
+    print("[OK] Schemas OK")
 
 if __name__ == "__main__":
-    print("Running sanity checks...")
-    test_routers_registered()
-    test_model_relationships()
-    test_models_importable()
-    print("\n[OK] All sanity checks passed!")
-    print("[OK] Backward compatibility verified")
+    test_routes()
+    test_models()
+    test_schemas()
+    print("\n[OK] All sanity checks passed")

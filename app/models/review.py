@@ -12,6 +12,8 @@ class EmotionLog(Base):
     child_id = Column(Integer, ForeignKey("children.child_id"), nullable=False)
     emotion_type = Column(String(50), nullable=False, index=True)
     intensity = Column(Integer, nullable=False)
+    source = Column(String(20), nullable=False, server_default="journal")
+    note = Column(String(500), nullable=True)
     audio_url = Column(String(500), nullable=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
@@ -28,3 +30,14 @@ class StickerCollection(Base):
     earned_at = Column(DateTime(timezone=True), server_default=func.now())
 
     child = relationship("Child", back_populates="sticker_collections")
+
+
+class ChildReadBook(Base):
+    __tablename__ = "child_read_books"
+
+    read_id = Column(Integer, primary_key=True, index=True)
+    child_id = Column(Integer, ForeignKey("children.child_id"), nullable=False)
+    book_id = Column(String(50), nullable=False)
+    read_at = Column(DateTime(timezone=True), server_default=func.now())
+
+    child = relationship("Child")

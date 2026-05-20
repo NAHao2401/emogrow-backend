@@ -17,7 +17,7 @@ def seed_data():
     Base.metadata.create_all(bind=engine)
 
     db = SessionLocal()
-    
+
     try:
         # Check if data already exists
         if db.query(Emotion).first():
@@ -52,9 +52,9 @@ def seed_data():
             )
             db.add(emotion)
             emotion_objects.append(emotion)
-            
+
         db.commit()
-        
+
         # Add some mock flashcards for "Vui vẻ" (id = 1)
         vui_ve_id = emotion_objects[0].emotion_id
         flashcards = [
@@ -83,10 +83,9 @@ def seed_data():
                 is_active=True
             )
         ]
-        
         for fc in flashcards:
             db.add(fc)
-            
+
         db.commit()
         print("Data seeded successfully!")
 

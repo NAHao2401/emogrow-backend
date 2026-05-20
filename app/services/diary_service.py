@@ -1,22 +1,22 @@
 from datetime import date
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session, joinedload
-from sqlalchemy import func
 
-from app.core.exceptions import NotFoundException, BadRequestException
+from app.core.exceptions import NotFoundException
 from app.models.emotion import Emotion
 from app.models.emotion_diary import EmotionDiary
+from app.models.review import EmotionLog
 from app.services.child_service import get_child_by_id
 
 
 def create_diary(child_id: int, data, db: Session, current_user):
-    # Ensure child belongs to current user
     child = get_child_by_id(child_id, db, current_user)
 
-    # Verify emotion exists
     emotion = db.query(Emotion).filter(Emotion.emotion_id == data.emotion_id).first()
     if not emotion:
         raise NotFoundException(message="Không tìm thấy cảm xúc", error_code="EMOTION_NOT_FOUND")
+
+    intensity = data.intensity or 5
 
     new_diary = EmotionDiary(
         child_id=child.child_id,
@@ -33,7 +33,16 @@ def create_diary(child_id: int, data, db: Session, current_user):
         db.commit()
         db.refresh(new_diary)
 
-        # Build response matching frontend expectation
+        emotion_log = EmotionLog(
+            child_id=new_diary.child_id,
+            emotion_type=emotion.name,
+            intensity=intensity,
+            note=new_diary.feeling_note,
+            source="journal",
+        )
+        db.add(emotion_log)
+        db.commit()
+
         return {
             "diary_id": new_diary.diary_id,
             "child_id": new_diary.child_id,
@@ -45,6 +54,7 @@ def create_diary(child_id: int, data, db: Session, current_user):
             "plant_state": new_diary.plant_state,
             "feeling_note": new_diary.feeling_note,
             "voice_url": new_diary.voice_url,
+            "intensity": intensity,
             "created_at": new_diary.created_at,
         }
 
@@ -54,11 +64,10 @@ def create_diary(child_id: int, data, db: Session, current_user):
 
 
 def get_diaries(child_id: int, db: Session, current_user, date_filter: date = None):
-    # Verify ownership
     get_child_by_id(child_id, db, current_user)
 
     query = db.query(EmotionDiary).options(joinedload(EmotionDiary.emotion)).filter(EmotionDiary.child_id == child_id)
-    
+
     if date_filter:
         query = query.filter(EmotionDiary.diary_date == date_filter)
 
@@ -77,6 +86,7 @@ def get_diaries(child_id: int, db: Session, current_user, date_filter: date = No
             "plant_state": diary.plant_state,
             "feeling_note": diary.feeling_note,
             "voice_url": diary.voice_url,
+            "intensity": 5,
             "created_at": diary.created_at,
         })
 
