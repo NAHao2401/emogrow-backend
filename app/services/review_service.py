@@ -133,7 +133,7 @@ def get_emotion_logs(
             source=log.source,
             note=log.note,
             audio_url=log.audio_url,
-            created_at=log.created_at.isoformat()
+            created_at=log.created_at.isoformat() if log.created_at else ""
         )
         for log in logs
     ]
@@ -153,7 +153,7 @@ def get_stickers(
             child_id=s.child_id,
             sticker_name=s.sticker_name,
             note=s.note,
-            earned_at=s.earned_at.isoformat()
+            earned_at=s.earned_at.isoformat() if s.earned_at else ""
         )
         for s in stickers
     ]

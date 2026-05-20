@@ -22,7 +22,7 @@ class EmotionLogResponse(BaseModel):
     child_id: int
     emotion_type: str
     intensity: int
-    source: str
+    source: Optional[str]
     note: Optional[str]
     audio_url: Optional[str]
     created_at: str
