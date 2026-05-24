@@ -6,6 +6,8 @@ class EmotionLogCreateRequest(BaseModel):
     child_id: int
     emotion_type: str = Field(..., min_length=1, max_length=50)
     intensity: int = Field(..., ge=1, le=10)
+    note: Optional[str] = Field(default=None, max_length=500)
+    source: str = Field(default="journal", max_length=20)
     audio_url: Optional[str] = Field(default=None, max_length=500)
 
 
@@ -20,6 +22,8 @@ class EmotionLogResponse(BaseModel):
     child_id: int
     emotion_type: str
     intensity: int
+    source: Optional[str]
+    note: Optional[str]
     audio_url: Optional[str]
     created_at: str
 
@@ -51,6 +55,24 @@ class EmotionStatisticsResponse(BaseModel):
     total_count: int
     average_intensity: float
     distribution: List[EmotionDistributionItem]
+
+    class Config:
+        from_attributes = True
+
+
+class ProgressResponse(BaseModel):
+    read_book_ids: List[str]
+    unlocked_sticker_ids: List[str]
+
+
+class BookReadRequest(BaseModel):
+    book_id: str
+
+
+class BookReadResponse(BaseModel):
+    read_id: int
+    child_id: int
+    book_id: str
 
     class Config:
         from_attributes = True
